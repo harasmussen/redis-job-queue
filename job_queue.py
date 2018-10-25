@@ -14,18 +14,18 @@ class JobQueue():
         signal.signal(signal.SIGTERM, self.terminate_signal)
         self.running = True
         while self.running:
-            _, body = self.redis_conn.blpop(self.queue_name, timeout=1)
-            if body is None:
+            job = self.redis_conn.blpop(self.queue_name, timeout=1)
+            if job is None:
                 continue
+            _, body = job
             try:
-                print(body)
-                job_func(body)
+                job_func(json.loads(body))
             except KeyboardInterrupt as e:
                 self.redis_conn.lpush(self.queue_name, body)
                 break
             except Exception as e:
                 print(e)
-                self.redis_conn.lpush(self.queue_name_error, body)
+                self.redis_conn.rpush(self.queue_name_error, body)
 
         print("Done")            
     

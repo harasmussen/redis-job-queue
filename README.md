@@ -13,7 +13,7 @@ docker-compose start
 from job_queue import JobQueue
 
 queue = JobQueue(queue_name='test_queue', host='0.0.0.0')
-queue.publish('Any message here')
+queue.publish({'message': 'test'})
 ```
 
 ## Consume
